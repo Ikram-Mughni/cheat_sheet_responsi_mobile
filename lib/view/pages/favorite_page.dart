@@ -6,22 +6,6 @@ import '../../routes/app_routes.dart';
 class FavoritePage extends StatelessWidget {
   const FavoritePage({super.key});
 
-  static const Color _portalGreen = Color(0xFF97CE4C);
-  static const Color _rickCyan = Color(0xFF00B5CC);
-  static const Color _mortyYellow = Color(0xFFF0E14A);
-  static const Color _darkCard = Color(0xFF161B26);
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'alive':
-        return _portalGreen;
-      case 'dead':
-        return const Color(0xFFFF5252);
-      default:
-        return const Color(0xFF9E9E9E);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final FavoriteController favController = Get.find<FavoriteController>();
@@ -31,34 +15,22 @@ class FavoritePage extends StatelessWidget {
         if (favController.favorites.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _mortyYellow.withOpacity(0.1),
-                      border: Border.all(color: _mortyYellow.withOpacity(0.3), width: 1.5),
-                    ),
-                    child: const Icon(Icons.favorite_border, size: 40, color: _mortyYellow),
-                  ),
-                  const SizedBox(height: 18),
+                  Icon(Icons.favorite_border, size: 64, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  // TODO (RESPONSI): Ganti teks judul status kosong ini sesuai tema aplikasi.
                   const Text(
-                    'Dimensi Favorit Masih Kosong',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    'Belum ada data favorit',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Karakter yang Anda beri tanda love akan disimpan pada halaman ini.',
+                  Text(
+                    'Item yang Anda sukai akan tersimpan pada daftar ini.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Color(0xFF8B949E)),
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -71,31 +43,27 @@ class FavoritePage extends StatelessWidget {
           itemCount: favController.favorites.length,
           itemBuilder: (context, index) {
             final character = favController.favorites[index];
-            final statusColor = _getStatusColor(character.status);
 
             return Dismissible(
+              // TODO (RESPONSI): Sesuaikan ID unik model (misal: item.id / item.idMeal).
               key: Key('fav_${character.id}'),
               direction: DismissDirection.endToStart,
               background: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFB00020),
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.red.shade600,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Icon(Icons.delete_sweep, color: Colors.white, size: 24),
+                    Icon(Icons.delete, color: Colors.white),
                     SizedBox(width: 8),
                     Text(
-                      'Hapus dari Favorit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
+                      'Hapus',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -103,67 +71,38 @@ class FavoritePage extends StatelessWidget {
               onDismissed: (_) {
                 favController.removeFavorite(character);
               },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                decoration: BoxDecoration(
-                  color: _darkCard,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF262F40), width: 1.2),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    leading: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: statusColor.withOpacity(0.5), width: 1.2),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(9),
-                        child: Image.network(
-                          character.image,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            width: 52,
-                            height: 52,
-                            color: const Color(0xFF202736),
-                            child: const Icon(Icons.person, color: _rickCyan),
-                          ),
-                        ),
+              child: Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      // TODO (RESPONSI): Sesuaikan pemanggilan data gambar thumbnail ini dengan model baru.
+                      character.image,
+                      width: 52,
+                      height: 52,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 52,
+                        height: 52,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.person, color: Colors.grey),
                       ),
                     ),
-                    title: Text(
-                      character.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 7,
-                            height: 7,
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${character.status} - ${character.species}',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF8B949E)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: _rickCyan),
-                    onTap: () {
-                      Get.toNamed(AppRoutes.detail, arguments: character);
-                    },
                   ),
+                  // TODO (RESPONSI): Sesuaikan nama/judul objek model favorit.
+                  title: Text(
+                    character.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  // TODO (RESPONSI): Sesuaikan sub-informasi objek model favorit.
+                  subtitle: Text('${character.status} • ${character.species}'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  onTap: () {
+                    // TODO (RESPONSI): Sesuaikan data arguments yang dikirim ke halaman detail.
+                    Get.toNamed(AppRoutes.detail, arguments: character);
+                  },
                 ),
               ),
             );

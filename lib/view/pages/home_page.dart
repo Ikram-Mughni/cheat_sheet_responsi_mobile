@@ -15,10 +15,6 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final CharacterController _charController = Get.find<CharacterController>();
 
-  static const Color _portalGreen = Color(0xFF97CE4C);
-  static const Color _rickCyan = Color(0xFF00B5CC);
-  static const Color _darkSurface = Color(0xFF131720);
-
   @override
   void dispose() {
     _searchController.dispose();
@@ -27,82 +23,65 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO (RESPONSI): Ganti opsi statusList ini dengan kategori/filter dari API soal responsi (misal: ['All', 'Action', 'Comedy']).
     final statusList = ['All', 'Alive', 'Dead', 'Unknown'];
 
     return Column(
       children: [
+        // Search Bar Area
         Container(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-          color: _darkSurface,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          color: Colors.white,
           child: Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: _searchController,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: 'Cari nama karakter...',
-                    hintStyle: const TextStyle(color: Color(0xFF6B7280), fontSize: 13),
-                    prefixIcon: const Icon(Icons.search, color: _rickCyan, size: 20),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.clear, color: Color(0xFF8B949E), size: 18),
-                      tooltip: 'Hapus teks',
-                      onPressed: () {
-                        _searchController.clear();
-                        _charController.setSearchQuery('');
-                      },
-                    ),
+                    // TODO (RESPONSI): Ganti hint search sesuai tema (misal: 'Cari nama produk...', 'Cari judul film...').
+                    hintText: 'Cari data...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              _charController.setSearchQuery('');
+                              setState(() {});
+                            },
+                          )
+                        : null,
                     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    filled: true,
-                    fillColor: const Color(0xFF1C2230),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: Color(0xFF2E384D)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: Color(0xFF2E384D)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: _portalGreen, width: 1.8),
-                    ),
                   ),
+                  onChanged: (val) {
+                    setState(() {});
+                  },
                   onSubmitted: (value) => _charController.setSearchQuery(value),
                 ),
               ),
               const SizedBox(width: 8),
-              SizedBox(
-                height: 46,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _portalGreen,
-                    foregroundColor: const Color(0xFF0D1117),
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(23),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  icon: const Icon(Icons.search, size: 18),
-                  label: const Text(
-                    'Cari',
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
-                  ),
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    _charController.setSearchQuery(_searchController.text);
-                  },
                 ),
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  _charController.setSearchQuery(_searchController.text);
+                },
+                child: const Text('Cari'),
               ),
             ],
           ),
         ),
 
+        // Filter Chips Area
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          color: _darkSurface,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Colors.white,
           child: Obx(
             () => SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -114,21 +93,6 @@ class _HomePageState extends State<HomePage> {
                     child: FilterChip(
                       label: Text(status),
                       selected: isSelected,
-                      showCheckmark: false,
-                      backgroundColor: const Color(0xFF1C2230),
-                      selectedColor: _portalGreen,
-                      side: BorderSide(
-                        color: isSelected ? _portalGreen : const Color(0xFF2E384D),
-                        width: 1.2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      labelStyle: TextStyle(
-                        color: isSelected ? const Color(0xFF0D1117) : Colors.white70,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
                       onSelected: (_) => _charController.setStatusFilter(status),
                     ),
                   );
@@ -137,28 +101,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+        const Divider(height: 1, thickness: 1),
 
-        Container(
-          height: 1,
-          color: const Color(0xFF262F40),
-        ),
-
+        // List Area
         Expanded(
           child: Obx(() {
             if (_charController.isLoading) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: _portalGreen),
-                    SizedBox(height: 14),
-                    Text(
-                      'Menghubungi Portal Multiverse...',
-                      style: TextStyle(color: _rickCyan, fontSize: 13),
-                    ),
-                  ],
-                ),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (_charController.errorMessage.isNotEmpty) {
@@ -168,28 +117,24 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.wifi_off, size: 54, color: Color(0xFFFF5252)),
+                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
                       const SizedBox(height: 12),
+                      // TODO (RESPONSI): Ganti teks judul pesan error jika diperlukan.
                       const Text(
-                        'Koneksi Multiverse Terputus!',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        'Gagal memuat data',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         _charController.errorMessage,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF8B949E)),
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _rickCyan,
-                          foregroundColor: const Color(0xFF0D1117),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
                         icon: const Icon(Icons.refresh, size: 18),
+                        label: const Text('Coba Lagi'),
                         onPressed: () => _charController.fetchCharacters(),
-                        label: const Text('Coba Lagi', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -202,16 +147,17 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.search_off, size: 60, color: Colors.grey.shade600),
+                    Icon(Icons.search_off, size: 54, color: Colors.grey.shade400),
                     const SizedBox(height: 12),
+                    // TODO (RESPONSI): Ganti teks saat data tidak ditemukan / kosong.
                     const Text(
-                      'Karakter tidak ditemukan di dimensi ini.',
-                      style: TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.bold),
+                      'Data tidak ditemukan',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Coba gunakan kata kunci nama atau filter lain.',
-                      style: TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                    Text(
+                      'Silakan coba gunakan kata kunci pencarian atau filter lain.',
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                     ),
                   ],
                 ),
@@ -219,14 +165,13 @@ class _HomePageState extends State<HomePage> {
             }
 
             return RefreshIndicator(
-              color: const Color(0xFF0D1117),
-              backgroundColor: _portalGreen,
               onRefresh: () async => await _charController.fetchCharacters(),
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: _charController.characters.length,
                 itemBuilder: (context, index) {
                   final character = _charController.characters[index];
+                  // TODO (RESPONSI): Sesuaikan argumen data yang dikirimkan ke detail_page saat item ditekan.
                   return CharacterCard(
                     character: character,
                     onTap: () {

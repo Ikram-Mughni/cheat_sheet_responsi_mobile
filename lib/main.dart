@@ -10,68 +10,63 @@ void main() async {
 
   // Inisialisasi Hive
   await Hive.initFlutter();
+  // TODO (RESPONSI): Sesuaikan nama box Hive jika di soal ditentukan nama box tertentu (atau jika mendaftarkan TypeAdapter custom).
   await Hive.openBox('usersBox');
 
   // Cek session login
   final prefs = await SharedPreferences.getInstance();
   final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-  runApp(RickAndMortyApp(initialRoute: isLoggedIn ? AppRoutes.root : AppRoutes.login));
+  runApp(App(initialRoute: isLoggedIn ? AppRoutes.root : AppRoutes.login));
 }
 
-class RickAndMortyApp extends StatelessWidget {
+class App extends StatelessWidget {
   final String initialRoute;
 
-  const RickAndMortyApp({super.key, required this.initialRoute});
+  const App({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
-    const portalGreen = Color(0xFF97CE4C);
-    const rickCyan = Color(0xFF00B5CC);
-    const darkBackground = Color(0xFF0D1117);
-    const darkSurface = Color(0xFF161B26);
-
     return GetMaterialApp(
-      title: 'Rick & Morty Character Explorer',
+      // TODO (RESPONSI): Ganti judul aplikasi sesuai tema soal.
+      title: 'Aplikasi Responsi',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: darkBackground,
-        colorScheme: const ColorScheme.dark(
-          primary: portalGreen,
-          secondary: rickCyan,
-          surface: darkSurface,
-          background: darkBackground,
+      theme: ThemeData(
+        useMaterial3: true,
+        // TODO (RESPONSI): Ganti warna tema utama (seedColor) jika ingin menyesuaikan dengan tema soal (misal: Colors.blue, Colors.teal, Colors.deepPurple).
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.indigo,
+          brightness: Brightness.light,
         ),
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF131720),
-          elevation: 0,
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+          elevation: 1,
           centerTitle: false,
-          iconTheme: IconThemeData(color: rickCyan),
         ),
-        cardColor: darkSurface,
+        cardColor: Colors.white,
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF121722),
-          labelStyle: const TextStyle(color: Color(0xFF8B949E)),
-          hintStyle: const TextStyle(color: Color(0xFF485260)),
-          prefixIconColor: rickCyan,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF262F40)),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF262F40)),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: portalGreen, width: 2),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.indigo, width: 2),
           ),
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF131720),
-          selectedItemColor: portalGreen,
-          unselectedItemColor: Color(0xFF6B7280),
+          backgroundColor: Colors.white,
+          selectedItemColor: Colors.indigo,
+          unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed,
           elevation: 8,
         ),

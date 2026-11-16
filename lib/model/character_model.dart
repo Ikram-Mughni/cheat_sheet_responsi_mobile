@@ -1,4 +1,5 @@
 class CharacterModel {
+  // TODO (RESPONSI): Sesuaikan tipe data dan nama variabel dengan struktur JSON dari API baru.
   final int id;
   final String name;
   final String status;
@@ -19,6 +20,7 @@ class CharacterModel {
     required this.image,
   });
 
+  // TODO (RESPONSI): Ganti key ['...'] sesuai dengan key JSON dari API. Berikan fallback aman (?? '' atau ?? 0).
   factory CharacterModel.fromJson(Map<String, dynamic> json) {
     return CharacterModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
@@ -32,6 +34,7 @@ class CharacterModel {
     );
   }
 
+  // TODO (RESPONSI): Sesuaikan mapping toJson jika model ini disimpan ke Local Storage (SharedPreferences / Hive).
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -45,4 +48,3 @@ class CharacterModel {
     };
   }
 }
-

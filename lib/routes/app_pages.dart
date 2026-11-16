@@ -22,6 +22,7 @@ class RootBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<AuthController>(() => AuthController());
     Get.lazyPut<RootController>(() => RootController());
+    // TODO (RESPONSI): Daftarkan Controller baru di sini jika membuat Controller baru untuk tema API yang berbeda.
     Get.lazyPut<CharacterController>(() => CharacterController());
     Get.lazyPut<FavoriteController>(() => FavoriteController());
     Get.lazyPut<EpisodeController>(() => EpisodeController());
@@ -29,6 +30,7 @@ class RootBinding extends Bindings {
 }
 
 class AppPages {
+  // TODO (RESPONSI): Daftarkan halaman dan binding baru di sini jika menambahkan route baru di aplikasi.
   static final routes = [
     GetPage(
       name: AppRoutes.login,
@@ -51,4 +53,3 @@ class AppPages {
     ),
   ];
 }
-

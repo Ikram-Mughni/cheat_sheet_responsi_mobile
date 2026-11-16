@@ -1,4 +1,5 @@
 class EpisodeModel {
+  // TODO (RESPONSI): Sesuaikan tipe data dan nama variabel untuk data sekunder (misal: Reviews, Episodes, Chapters).
   final int id;
   final String name;
   final String airDate;
@@ -11,6 +12,7 @@ class EpisodeModel {
     required this.episodeCode,
   });
 
+  // TODO (RESPONSI): Ganti key ['...'] sesuai dengan key JSON dari API data sekunder.
   factory EpisodeModel.fromJson(Map<String, dynamic> json) {
     return EpisodeModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
@@ -20,4 +22,3 @@ class EpisodeModel {
     );
   }
 }
-

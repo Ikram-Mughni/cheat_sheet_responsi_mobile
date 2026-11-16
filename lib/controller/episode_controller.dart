@@ -3,6 +3,7 @@ import '../model/episode_model.dart';
 import '../service/api_service.dart';
 
 class EpisodeController extends GetxController {
+  // TODO (RESPONSI): Ganti nama variabel list dan tipe Model ini sesuai tema (misal: RxList<ReviewModel> _reviews = <ReviewModel>[].obs;).
   final RxList<EpisodeModel> _episodes = <EpisodeModel>[].obs;
   final RxBool _isLoading = false.obs;
   final RxString _errorMessage = ''.obs;
@@ -21,6 +22,7 @@ class EpisodeController extends GetxController {
     try {
       _isLoading.value = true;
       _errorMessage.value = '';
+      // TODO (RESPONSI): Panggil method fetch data sekunder yang sesuai dari ApiService.
       final data = await ApiService.fetchEpisodes();
       _episodes.assignAll(data);
     } catch (e) {
@@ -31,4 +33,3 @@ class EpisodeController extends GetxController {
     }
   }
 }
-

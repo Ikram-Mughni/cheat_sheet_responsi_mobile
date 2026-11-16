@@ -1,4 +1,6 @@
+// TODO (RESPONSI): Pastikan typeId unik jika membuat class model Hive yang baru (contoh: @HiveType(typeId: 0)).
 class UserModel {
+  // TODO (RESPONSI): Sesuaikan atribut user jika diperlukan (misal: username, password, email, token).
   final String username;
   final String password;
 
@@ -21,4 +23,3 @@ class UserModel {
     };
   }
 }
-

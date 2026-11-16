@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/character_model.dart';
 
 class FavoriteController extends GetxController {
+  // TODO (RESPONSI): Ganti nama variabel list dan tipe Model ini sesuai tema (misal: RxList<MovieModel> _favorites = <MovieModel>[].obs;).
   final RxList<CharacterModel> _favorites = <CharacterModel>[].obs;
   List<CharacterModel> get favorites => _favorites;
 
@@ -18,10 +19,11 @@ class FavoriteController extends GetxController {
   Future<String> _getFavKey() async {
     final prefs = await SharedPreferences.getInstance();
     final String currentUser = prefs.getString('currentUser') ?? 'guest';
-    return 'rick_morty_favorites_$currentUser';
+    // TODO (RESPONSI): Sesuaikan prefix nama key SharedPreferences favorit jika diperlukan.
+    return 'app_favorites_$currentUser';
   }
 
-  // Load favorit
+  // Load data favorit dari Local Storage (SharedPreferences)
   Future<void> loadFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getFavKey();
@@ -31,6 +33,7 @@ class FavoriteController extends GetxController {
     if (rawData != null && rawData.isNotEmpty) {
       try {
         final List<dynamic> decoded = jsonDecode(rawData);
+        // TODO (RESPONSI): Pastikan fromJson pada model digunakan untuk deserialize data lokal.
         _favorites.assignAll(decoded.map((item) => CharacterModel.fromJson(item)).toList());
       } catch (e) {
         _favorites.clear();
@@ -38,10 +41,11 @@ class FavoriteController extends GetxController {
     }
   }
 
-  // Simpan favorit
+  // Simpan data favorit ke SharedPreferences
   Future<void> _saveFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getFavKey();
+    // TODO (RESPONSI): Pastikan toJson() tersedia pada model untuk serialisasi JSON.
     final String encoded = jsonEncode(_favorites.map((e) => e.toJson()).toList());
     await prefs.setString(key, encoded);
   }
@@ -54,33 +58,31 @@ class FavoriteController extends GetxController {
     if (isFavorite(character.id)) {
       _favorites.removeWhere((item) => item.id == character.id);
       _saveFavorites();
+      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika diperlukan.
       Get.snackbar(
         'Dihapus dari Favorit',
-        '${character.name} telah disingkirkan dari daftar favorit.',
+        '${character.name} telah dihapus dari daftar favorit.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF161B26),
-        borderColor: const Color(0xFFFF5252),
-        borderWidth: 1.2,
+        backgroundColor: Colors.grey.shade800,
         colorText: Colors.white,
-        icon: const Icon(Icons.favorite_border, color: Color(0xFFFF5252)),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 12,
+        icon: const Icon(Icons.favorite_border, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
         duration: const Duration(seconds: 2),
       );
     } else {
       _favorites.add(character);
       _saveFavorites();
+      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika item berhasil ditambahkan ke favorit.
       Get.snackbar(
         'Ditambahkan ke Favorit',
-        '${character.name} berhasil disimpan ke daftar favorit!',
+        '${character.name} berhasil ditambahkan ke daftar favorit!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF161B26),
-        borderColor: const Color(0xFF97CE4C),
-        borderWidth: 1.2,
+        backgroundColor: Colors.indigo,
         colorText: Colors.white,
-        icon: const Icon(Icons.favorite, color: Color(0xFFF0E14A)),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 12,
+        icon: const Icon(Icons.favorite, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
         duration: const Duration(seconds: 2),
       );
     }
@@ -90,21 +92,19 @@ class FavoriteController extends GetxController {
     _favorites.removeWhere((item) => item.id == character.id);
     _saveFavorites();
     Get.snackbar(
-      'Karakter Dihapus',
-      '${character.name} telah disingkirkan dari daftar favorit.',
+      'Item Dihapus',
+      '${character.name} telah dihapus dari daftar favorit.',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF161B26),
-      borderColor: const Color(0xFFFF5252),
-      borderWidth: 1.2,
+      backgroundColor: Colors.red.shade700,
       colorText: Colors.white,
-      icon: const Icon(Icons.delete_sweep, color: Color(0xFFFF5252)),
-      margin: const EdgeInsets.all(12),
-      borderRadius: 12,
+      icon: const Icon(Icons.delete_outline, color: Colors.white),
+      margin: const EdgeInsets.all(16),
+      borderRadius: 8,
       duration: const Duration(seconds: 2),
     );
   }
 
-  // Reset state favorit
+  // Reset state favorit (misal saat logout)
   void clearState() {
     _favorites.clear();
   }

@@ -13,6 +13,7 @@ class AuthController extends GetxController {
   final RxString _username = ''.obs;
   String get username => _username.value;
 
+  // TODO (RESPONSI): Sesuaikan nama box Hive jika di soal ditentukan nama box tertentu.
   final Box _userBox = Hive.box('usersBox');
 
   @override
@@ -36,8 +37,11 @@ class AuthController extends GetxController {
         'Validasi Gagal',
         'Username dan Password wajib diisi!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
       );
       return;
     }
@@ -47,8 +51,11 @@ class AuthController extends GetxController {
         'Registrasi Gagal',
         'Username "$cleanUsername" sudah terdaftar. Silakan gunakan username lain.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.orange.shade800,
         colorText: Colors.white,
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
       );
       return;
     }
@@ -60,16 +67,15 @@ class AuthController extends GetxController {
     _isLoading.value = false;
 
     Get.snackbar(
-      'Berhasil!',
+      'Berhasil',
       'Akun berhasil dibuat. Silakan login.',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF161B26),
-      borderColor: const Color(0xFF97CE4C),
-      borderWidth: 1.2,
+      backgroundColor: Colors.indigo,
       colorText: Colors.white,
-      icon: const Icon(Icons.check_circle_outline, color: Color(0xFF97CE4C)),
-      margin: const EdgeInsets.all(12),
-      borderRadius: 12,
+      icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+      margin: const EdgeInsets.all(16),
+      borderRadius: 8,
+      duration: const Duration(seconds: 2),
     );
     Get.offNamed(AppRoutes.login);
   }
@@ -83,8 +89,11 @@ class AuthController extends GetxController {
         'Validasi Gagal',
         'Username dan Password tidak boleh kosong!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
       );
       return;
     }
@@ -114,13 +123,12 @@ class AuthController extends GetxController {
         'Login Gagal',
         'Username atau Password salah!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF161B26),
-        borderColor: const Color(0xFFFF5252),
-        borderWidth: 1.2,
+        backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
-        icon: const Icon(Icons.error_outline, color: Color(0xFFFF5252)),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 12,
+        icon: const Icon(Icons.error_outline, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
+        duration: const Duration(seconds: 2),
       );
     }
   }

@@ -6,66 +6,33 @@ import '../../model/character_model.dart';
 class DetailPage extends StatelessWidget {
   const DetailPage({super.key});
 
-  static const Color _portalGreen = Color(0xFF97CE4C);
-  static const Color _rickCyan = Color(0xFF00B5CC);
-  static const Color _mortyYellow = Color(0xFFF0E14A);
-  static const Color _darkCard = Color(0xFF161B26);
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'alive':
-        return _portalGreen;
-      case 'dead':
-        return const Color(0xFFFF5252);
-      default:
-        return const Color(0xFF9E9E9E);
-    }
-  }
-
-  Widget _buildSpecCard(IconData icon, String label, String value, Color accentColor) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: _darkCard,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF262F40), width: 1.2),
-      ),
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
+          Icon(icon, size: 20, color: Colors.indigo),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            child: Icon(icon, color: accentColor, size: 22),
           ),
-          const SizedBox(width: 14),
+          const Text(': '),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.2,
-                    color: Color(0xFF8B949E),
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -75,24 +42,22 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO (RESPONSI): Ganti casting 'as CharacterModel' sesuai dengan Model data yang dikirim via Get.arguments.
     final CharacterModel character = Get.arguments as CharacterModel;
     final FavoriteController favController = Get.find<FavoriteController>();
-    final statusColor = _getStatusColor(character.status);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          character.name,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-        ),
+        // TODO (RESPONSI): Sesuaikan judul AppBar dengan nama/title objek model.
+        title: Text(character.name),
         actions: [
           Obx(() {
+            // TODO (RESPONSI): Sesuaikan ID unik model untuk cek status favorit.
             final isFav = favController.isFavorite(character.id);
             return IconButton(
               icon: Icon(
                 isFav ? Icons.favorite : Icons.favorite_border,
-                color: isFav ? _mortyYellow : Colors.white,
-                size: 26,
+                color: isFav ? Colors.red : Colors.white,
               ),
               tooltip: isFav ? 'Hapus dari favorit' : 'Tambah ke favorit',
               onPressed: () => favController.toggleFavorite(character),
@@ -101,113 +66,92 @@ class DetailPage extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 90),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Gambar Utama (Hero Banner)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF131720),
-                    Color(0xFF0D1117),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 210,
-                  height: 210,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: statusColor.withOpacity(0.8), width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: statusColor.withOpacity(0.4),
-                        blurRadius: 28,
-                        spreadRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.network(
-                      character.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: const Color(0xFF1C2230),
-                        child: const Icon(Icons.person, color: _rickCyan, size: 80),
-                      ),
-                    ),
-                  ),
+              height: 280,
+              color: Colors.grey.shade100,
+              child: Image.network(
+                // TODO (RESPONSI): Sesuaikan pemanggilan data gambar utama ini dengan properti model yang baru (misal: item.image / item.poster).
+                character.image,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+                errorBuilder: (context, error, stackTrace) => const Center(
+                  child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
                 ),
               ),
             ),
 
+            // Konten Detail
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    character.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor.withOpacity(0.6), width: 1.2),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: statusColor.withOpacity(0.8),
-                                blurRadius: 6,      
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          character.status.toUpperCase(),
-                          style: TextStyle(
-                            color: statusColor,
+                  // Judul & Badge Status
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        // TODO (RESPONSI): Sesuaikan pemanggilan data judul/nama utama ini dengan properti model yang baru.
+                        child: Text(
+                          character.name,
+                          style: const TextStyle(
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            letterSpacing: 1.0,
                           ),
                         ),
-                      ],
+                      ),
+                      // TODO (RESPONSI): Sesuaikan badge kategori/status dengan field model baru.
+                      Chip(
+                        label: Text(
+                          character.status,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: character.status.toLowerCase() == 'alive'
+                            ? Colors.green.shade100
+                            : (character.status.toLowerCase() == 'dead'
+                                ? Colors.red.shade100
+                                : Colors.grey.shade200),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Card Informasi Rinci
+                  Card(
+                    elevation: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // TODO (RESPONSI): Ganti teks judul section kartu info ini sesuai tema aplikasi.
+                          const Text(
+                            'Informasi Lengkap',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo,
+                            ),
+                          ),
+                          const Divider(height: 24),
+                          // TODO (RESPONSI): Sesuaikan baris-baris informasi detail ini dengan atribut model baru.
+                          _buildDetailRow(Icons.category_outlined, 'Spesies', character.species),
+                          _buildDetailRow(Icons.person_outline, 'Gender', character.gender),
+                          _buildDetailRow(Icons.public_outlined, 'Asal (Origin)', character.origin),
+                          _buildDetailRow(Icons.location_on_outlined, 'Lokasi', character.location),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  _buildSpecCard(Icons.fingerprint, 'Spesies', character.species, _rickCyan),
-                  const SizedBox(height: 10),
-                  _buildSpecCard(Icons.transgender, 'Gender', character.gender, _portalGreen),
-                  const SizedBox(height: 10),
-                  _buildSpecCard(Icons.public, 'Asal Dimensi (Origin)', character.origin, _mortyYellow),
-                  const SizedBox(height: 10),
-                  _buildSpecCard(Icons.near_me, 'Lokasi Terakhir', character.location, const Color(0xFFFF7A00)),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -217,15 +161,12 @@ class DetailPage extends StatelessWidget {
       floatingActionButton: Obx(() {
         final isFav = favController.isFavorite(character.id);
         return FloatingActionButton.extended(
-          backgroundColor: isFav ? _mortyYellow : _portalGreen,
-          foregroundColor: const Color(0xFF0D1117),
-          elevation: 6,
-          icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-          label: Text(
-            isFav ? 'HAPUS FAVORIT' : 'TAMBAH FAVORIT',
-            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.8),
-          ),
           onPressed: () => favController.toggleFavorite(character),
+          icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
+          // TODO (RESPONSI): Ganti label teks tombol aksi favorit jika diperlukan.
+          label: Text(isFav ? 'Hapus Favorit' : 'Tambah Favorit'),
+          backgroundColor: isFav ? Colors.red : Colors.indigo,
+          foregroundColor: Colors.white,
         );
       }),
     );
