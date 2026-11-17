@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import '../controller/auth_controller.dart';
-import '../controller/character_controller.dart';
-import '../controller/episode_controller.dart';
 import '../controller/favorite_controller.dart';
 import '../controller/root_controller.dart';
+import '../controller/spell_controller.dart'; // TERUBAH: Import SpellController menggantikan EpisodeController
+import '../controller/wizard_controller.dart'; // TERUBAH: Import WizardController menggantikan CharacterController
 import '../view/pages/detail_page.dart';
 import '../view/pages/login_page.dart';
 import '../view/pages/register_page.dart';
@@ -22,15 +22,16 @@ class RootBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<AuthController>(() => AuthController());
     Get.lazyPut<RootController>(() => RootController());
-    // TODO (RESPONSI): Daftarkan Controller baru di sini jika membuat Controller baru untuk tema API yang berbeda.
-    Get.lazyPut<CharacterController>(() => CharacterController());
+    // TERUBAH: Mendaftarkan WizardController untuk mengelola data penyihir
+    Get.lazyPut<WizardController>(() => WizardController());
+    // TERUBAH: Mendaftarkan FavoriteController untuk mengelola penyihir favorit
     Get.lazyPut<FavoriteController>(() => FavoriteController());
-    Get.lazyPut<EpisodeController>(() => EpisodeController());
+    // TERUBAH: Mendaftarkan SpellController untuk mengelola data mantra
+    Get.lazyPut<SpellController>(() => SpellController());
   }
 }
 
 class AppPages {
-  // TODO (RESPONSI): Daftarkan halaman dan binding baru di sini jika menambahkan route baru di aplikasi.
   static final routes = [
     GetPage(
       name: AppRoutes.login,

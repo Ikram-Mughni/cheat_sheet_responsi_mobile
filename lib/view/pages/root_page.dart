@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/root_controller.dart';
-import 'episode_page.dart';
+import '../../controller/wizard_controller.dart'; // TERUBAH: Import WizardController
 import 'favorite_page.dart';
 import 'home_page.dart';
+import 'spell_page.dart'; // TERUBAH: Import SpellPage menggantikan EpisodePage
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -14,11 +15,11 @@ class RootPage extends StatelessWidget {
     final RootController rootController = Get.find<RootController>();
     final AuthController authController = Get.find<AuthController>();
 
-    // TODO (RESPONSI): Sesuaikan daftar halaman yang dikelola oleh IndexedStack / BottomNavigationBar.
+    // TERUBAH: Mengganti halaman ketiga menjadi SpellPage
     final List<Widget> pages = const [
       HomePage(),
       FavoritePage(),
-      EpisodePage(),
+      SpellPage(),
     ];
 
     return Scaffold(
@@ -31,16 +32,16 @@ class RootPage extends StatelessWidget {
               Text(
                 authController.username.isNotEmpty
                     ? 'Halo, ${authController.username}!'
-                    : 'Halo, Pengguna!',
+                    : 'Halo, Penyihir!',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Colors.white,
                 ),
               ),
-              // TODO (RESPONSI): Ganti teks sub-judul di AppBar ini sesuai tema soal responsi.
+              // TERUBAH: Subtitle AppBar disesuaikan dengan tema Hogwarts
               const Text(
-                'Katalog Data & Informasi',
+                'Katalog Dunia Sihir Hogwarts',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.white70,
@@ -50,17 +51,32 @@ class RootPage extends StatelessWidget {
           ),
         ),
         actions: [
+          // TERUBAH: Tombol Sort A-Z di AppBar saat aktif di tab Penyihir (Bonus 2)
+          Obx(() {
+            if (rootController.currentIndex == 0) {
+              final wizardController = Get.find<WizardController>();
+              return Obx(() => IconButton(
+                    icon: Icon(
+                      wizardController.isAscending ? Icons.sort_by_alpha : Icons.sort,
+                      color: wizardController.isAscending ? Colors.amberAccent : Colors.white,
+                    ),
+                    tooltip: wizardController.isAscending ? 'Kembalikan Urutan' : 'Urutkan A-Z',
+                    onPressed: () => wizardController.toggleSort(),
+                  ));
+            }
+            return const SizedBox.shrink();
+          }),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
             onPressed: () {
               Get.defaultDialog(
                 title: 'Konfirmasi Keluar',
-                middleText: 'Apakah Anda yakin ingin keluar?',
+                middleText: 'Apakah Anda yakin ingin keluar dari Hogwarts Explorer?',
                 textConfirm: 'Ya, Keluar',
                 textCancel: 'Batal',
                 confirmTextColor: Colors.white,
-                buttonColor: Colors.red,
+                buttonColor: Colors.deepPurple,
                 onConfirm: () {
                   Get.back();
                   authController.logout();
@@ -80,12 +96,12 @@ class RootPage extends StatelessWidget {
         () => BottomNavigationBar(
           currentIndex: rootController.currentIndex,
           onTap: rootController.changeIndex,
-          // TODO (RESPONSI): Sesuaikan label teks dan icon pada BottomNavigationBarItem sesuai kebutuhan soal.
+          // TERUBAH: Item BottomNavigationBar disesuaikan menjadi Penyihir, Favorit, dan Mantra
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Beranda',
+              icon: Icon(Icons.auto_awesome_outlined),
+              activeIcon: Icon(Icons.auto_awesome),
+              label: 'Penyihir',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.favorite_border),
@@ -93,9 +109,9 @@ class RootPage extends StatelessWidget {
               label: 'Favorit',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.list_alt_outlined),
-              activeIcon: Icon(Icons.list_alt),
-              label: 'Episode',
+              icon: Icon(Icons.menu_book_outlined),
+              activeIcon: Icon(Icons.menu_book),
+              label: 'Mantra',
             ),
           ],
         ),

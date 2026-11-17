@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/favorite_controller.dart';
-import '../../model/character_model.dart';
+import '../../model/wizard_model.dart'; // TERUBAH: Import WizardModel menggantikan CharacterModel
 
 class DetailPage extends StatelessWidget {
   const DetailPage({super.key});
@@ -12,7 +12,7 @@ class DetailPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: Colors.indigo),
+          Icon(icon, size: 20, color: Colors.deepPurple), // TERUBAH: Warna aksen ungu magis
           const SizedBox(width: 12),
           SizedBox(
             width: 110,
@@ -42,25 +42,26 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO (RESPONSI): Ganti casting 'as CharacterModel' sesuai dengan Model data yang dikirim via Get.arguments.
-    final CharacterModel character = Get.arguments as CharacterModel;
+    // TERUBAH: Mengambil argument dan casting ke WizardModel
+    final WizardModel wizard = Get.arguments as WizardModel;
     final FavoriteController favController = Get.find<FavoriteController>();
 
     return Scaffold(
       appBar: AppBar(
-        // TODO (RESPONSI): Sesuaikan judul AppBar dengan nama/title objek model.
-        title: Text(character.name),
+        // TERUBAH: Judul AppBar menampilkan nama penyihir
+        title: Text(wizard.name),
         actions: [
           Obx(() {
-            // TODO (RESPONSI): Sesuaikan ID unik model untuk cek status favorit.
-            final isFav = favController.isFavorite(character.id);
+            // TERUBAH: Memeriksa status favorit dengan wizard.id String
+            final isFav = favController.isFavorite(wizard.id);
             return IconButton(
               icon: Icon(
                 isFav ? Icons.favorite : Icons.favorite_border,
-                color: isFav ? Colors.red : Colors.white,
+                color: isFav ? Colors.redAccent : Colors.white,
               ),
               tooltip: isFav ? 'Hapus dari favorit' : 'Tambah ke favorit',
-              onPressed: () => favController.toggleFavorite(character),
+              // TERUBAH: Toggle favorit menggunakan objek wizard
+              onPressed: () => favController.toggleFavorite(wizard),
             );
           }),
         ],
@@ -69,23 +70,30 @@ class DetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar Utama (Hero Banner)
+            // Gambar Utama (Hero Banner Foto Penyihir)
             Container(
               width: double.infinity,
               height: 280,
               color: Colors.grey.shade100,
-              child: Image.network(
-                // TODO (RESPONSI): Sesuaikan pemanggilan data gambar utama ini dengan properti model yang baru (misal: item.image / item.poster).
-                character.image,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
-                ),
-              ),
+              // TERUBAH: Fallback gambar jika wizard.image kosong dari API
+              child: wizard.image.isNotEmpty
+                  ? Image.network(
+                      wizard.image, // TERUBAH: URL foto karakter penyihir
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                      ),
+                    )
+                  : Container(
+                      color: Colors.deepPurple.shade100,
+                      child: const Center(
+                        child: Icon(Icons.auto_awesome, size: 80, color: Colors.deepPurple),
+                      ),
+                    ),
             ),
 
             // Konten Detail
@@ -94,37 +102,38 @@ class DetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Judul & Badge Status
+                  // Judul & Badge Asrama + Status
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        // TODO (RESPONSI): Sesuaikan pemanggilan data judul/nama utama ini dengan properti model yang baru.
+                        // TERUBAH: Menampilkan nama penyihir
                         child: Text(
-                          character.name,
+                          wizard.name,
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      // TODO (RESPONSI): Sesuaikan badge kategori/status dengan field model baru.
+                      const SizedBox(width: 8),
+                      // TERUBAH: Badge status hidup (Alive/Deceased)
                       Chip(
                         label: Text(
-                          character.status,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          wizard.alive ? 'Alive' : 'Deceased',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: wizard.alive ? Colors.green.shade800 : Colors.red.shade800,
+                          ),
                         ),
-                        backgroundColor: character.status.toLowerCase() == 'alive'
-                            ? Colors.green.shade100
-                            : (character.status.toLowerCase() == 'dead'
-                                ? Colors.red.shade100
-                                : Colors.grey.shade200),
+                        backgroundColor: wizard.alive ? Colors.green.shade50 : Colors.red.shade50,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // Card Informasi Rinci
+                  // Card Informasi Rinci Penyihir
                   Card(
                     elevation: 1,
                     child: Padding(
@@ -132,21 +141,22 @@ class DetailPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // TODO (RESPONSI): Ganti teks judul section kartu info ini sesuai tema aplikasi.
+                          // TERUBAH: Judul kartu informasi Hogwarts
                           const Text(
-                            'Informasi Lengkap',
+                            'Informasi Profil Penyihir',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.indigo,
+                              color: Colors.deepPurple,
                             ),
                           ),
                           const Divider(height: 24),
-                          // TODO (RESPONSI): Sesuaikan baris-baris informasi detail ini dengan atribut model baru.
-                          _buildDetailRow(Icons.category_outlined, 'Spesies', character.species),
-                          _buildDetailRow(Icons.person_outline, 'Gender', character.gender),
-                          _buildDetailRow(Icons.public_outlined, 'Asal (Origin)', character.origin),
-                          _buildDetailRow(Icons.location_on_outlined, 'Lokasi', character.location),
+                          // TERUBAH: Baris-baris informasi detail karakter Hogwarts
+                          _buildDetailRow(Icons.shield_outlined, 'Asrama (House)', wizard.house),
+                          _buildDetailRow(Icons.person_outline, 'Spesies', wizard.species),
+                          _buildDetailRow(Icons.theater_comedy_outlined, 'Aktor Pemeran', wizard.actor),
+                          _buildDetailRow(Icons.auto_fix_high, 'Patronus', wizard.patronus),
+                          _buildDetailRow(Icons.cake_outlined, 'Tanggal Lahir', wizard.dateOfBirth),
                         ],
                       ),
                     ),
@@ -159,13 +169,15 @@ class DetailPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: Obx(() {
-        final isFav = favController.isFavorite(character.id);
+        // TERUBAH: Cek status favorit reaktif dengan wizard.id
+        final isFav = favController.isFavorite(wizard.id);
         return FloatingActionButton.extended(
-          onPressed: () => favController.toggleFavorite(character),
+          // TERUBAH: Toggle favorit dengan objek wizard
+          onPressed: () => favController.toggleFavorite(wizard),
           icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-          // TODO (RESPONSI): Ganti label teks tombol aksi favorit jika diperlukan.
-          label: Text(isFav ? 'Hapus Favorit' : 'Tambah Favorit'),
-          backgroundColor: isFav ? Colors.red : Colors.indigo,
+          // TERUBAH: Label tombol aksi favorit
+          label: Text(isFav ? 'Hapus Favorit' : 'Simpan Penyihir'),
+          backgroundColor: isFav ? Colors.red.shade600 : Colors.deepPurple,
           foregroundColor: Colors.white,
         );
       }),

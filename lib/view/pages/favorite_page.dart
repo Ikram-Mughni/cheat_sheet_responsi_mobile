@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/favorite_controller.dart';
+import '../../model/wizard_model.dart'; // TERUBAH: Import WizardModel menggantikan CharacterModel
 import '../../routes/app_routes.dart';
 
 class FavoritePage extends StatelessWidget {
@@ -21,14 +22,14 @@ class FavoritePage extends StatelessWidget {
                 children: [
                   Icon(Icons.favorite_border, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
-                  // TODO (RESPONSI): Ganti teks judul status kosong ini sesuai tema aplikasi.
+                  // TERUBAH: Pesan status favorit kosong khusus Hogwarts
                   const Text(
-                    'Belum ada data favorit',
+                    'Belum ada penyihir favorit',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Item yang Anda sukai akan tersimpan pada daftar ini.',
+                    'Karakter penyihir yang Anda sukai akan tersimpan pada daftar ini.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
@@ -42,11 +43,12 @@ class FavoritePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: favController.favorites.length,
           itemBuilder: (context, index) {
-            final character = favController.favorites[index];
+            // TERUBAH: Mengambil data WizardModel favorit
+            final wizard = favController.favorites[index];
 
             return Dismissible(
-              // TODO (RESPONSI): Sesuaikan ID unik model (misal: item.id / item.idMeal).
-              key: Key('fav_${character.id}'),
+              // TERUBAH: Key unik menggunakan wizard.id String UUID
+              key: Key('fav_${wizard.id}'),
               direction: DismissDirection.endToStart,
               background: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -69,7 +71,8 @@ class FavoritePage extends StatelessWidget {
                 ),
               ),
               onDismissed: (_) {
-                favController.removeFavorite(character);
+                // TERUBAH: Memanggil removeFavorite dengan objek wizard
+                favController.removeFavorite(wizard);
               },
               child: Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -77,31 +80,38 @@ class FavoritePage extends StatelessWidget {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      // TODO (RESPONSI): Sesuaikan pemanggilan data gambar thumbnail ini dengan model baru.
-                      character.image,
-                      width: 52,
-                      height: 52,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 52,
-                        height: 52,
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.person, color: Colors.grey),
-                      ),
-                    ),
+                    // TERUBAH: Fallback gambar jika wizard.image kosong
+                    child: wizard.image.isNotEmpty
+                        ? Image.network(
+                            wizard.image, // TERUBAH: Foto thumbnail penyihir favorit
+                            width: 52,
+                            height: 52,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: 52,
+                              height: 52,
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.person, color: Colors.grey),
+                            ),
+                          )
+                        : Container(
+                            width: 52,
+                            height: 52,
+                            color: Colors.deepPurple.shade50,
+                            child: const Icon(Icons.auto_awesome, color: Colors.deepPurple),
+                          ),
                   ),
-                  // TODO (RESPONSI): Sesuaikan nama/judul objek model favorit.
+                  // TERUBAH: Nama karakter penyihir
                   title: Text(
-                    character.name,
+                    wizard.name,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // TODO (RESPONSI): Sesuaikan sub-informasi objek model favorit.
-                  subtitle: Text('${character.status} • ${character.species}'),
+                  // TERUBAH: Subtitle asrama dan spesies karakter
+                  subtitle: Text('${wizard.house} • ${wizard.species}'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                   onTap: () {
-                    // TODO (RESPONSI): Sesuaikan data arguments yang dikirim ke halaman detail.
-                    Get.toNamed(AppRoutes.detail, arguments: character);
+                    // TERUBAH: Navigasi ke detail dengan membawa objek wizard
+                    Get.toNamed(AppRoutes.detail, arguments: wizard);
                   },
                 ),
               ),

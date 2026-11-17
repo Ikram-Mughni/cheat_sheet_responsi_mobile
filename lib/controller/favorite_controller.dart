@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/character_model.dart';
+import '../model/wizard_model.dart'; // TERUBAH: Import WizardModel menggantikan CharacterModel
 
 class FavoriteController extends GetxController {
-  // TODO (RESPONSI): Ganti nama variabel list dan tipe Model ini sesuai tema (misal: RxList<MovieModel> _favorites = <MovieModel>[].obs;).
-  final RxList<CharacterModel> _favorites = <CharacterModel>[].obs;
-  List<CharacterModel> get favorites => _favorites;
+  // TERUBAH: Mengganti tipe data list menjadi RxList<WizardModel>
+  final RxList<WizardModel> _favorites = <WizardModel>[].obs;
+  List<WizardModel> get favorites => _favorites;
 
   @override
   void onInit() {
@@ -19,8 +19,8 @@ class FavoriteController extends GetxController {
   Future<String> _getFavKey() async {
     final prefs = await SharedPreferences.getInstance();
     final String currentUser = prefs.getString('currentUser') ?? 'guest';
-    // TODO (RESPONSI): Sesuaikan prefix nama key SharedPreferences favorit jika diperlukan.
-    return 'app_favorites_$currentUser';
+    // TERUBAH: Mengubah prefix key favorit menjadi 'hogwarts_favorites_' sesuai ketentuan soal
+    return 'hogwarts_favorites_$currentUser';
   }
 
   // Load data favorit dari Local Storage (SharedPreferences)
@@ -33,8 +33,8 @@ class FavoriteController extends GetxController {
     if (rawData != null && rawData.isNotEmpty) {
       try {
         final List<dynamic> decoded = jsonDecode(rawData);
-        // TODO (RESPONSI): Pastikan fromJson pada model digunakan untuk deserialize data lokal.
-        _favorites.assignAll(decoded.map((item) => CharacterModel.fromJson(item)).toList());
+        // TERUBAH: Menggunakan WizardModel.fromJson untuk deserialize data karakter favorit
+        _favorites.assignAll(decoded.map((item) => WizardModel.fromJson(item)).toList());
       } catch (e) {
         _favorites.clear();
       }
@@ -45,23 +45,25 @@ class FavoriteController extends GetxController {
   Future<void> _saveFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getFavKey();
-    // TODO (RESPONSI): Pastikan toJson() tersedia pada model untuk serialisasi JSON.
+    // TERUBAH: Menggunakan toJson() dari WizardModel
     final String encoded = jsonEncode(_favorites.map((e) => e.toJson()).toList());
     await prefs.setString(key, encoded);
   }
 
-  bool isFavorite(int id) {
-    return _favorites.any((character) => character.id == id);
+  // TERUBAH: Mengubah parameter tipe id dari int menjadi String (UUID HP-API)
+  bool isFavorite(String id) {
+    return _favorites.any((wizard) => wizard.id == id);
   }
 
-  void toggleFavorite(CharacterModel character) {
-    if (isFavorite(character.id)) {
-      _favorites.removeWhere((item) => item.id == character.id);
+  // TERUBAH: Mengubah parameter method toggleFavorite menjadi WizardModel wizard
+  void toggleFavorite(WizardModel wizard) {
+    if (isFavorite(wizard.id)) {
+      _favorites.removeWhere((item) => item.id == wizard.id);
       _saveFavorites();
-      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika diperlukan.
+      // TERUBAH: Notifikasi SnackBar saat karakter dihapus dari favorit
       Get.snackbar(
         'Dihapus dari Favorit',
-        '${character.name} telah dihapus dari daftar favorit.',
+        '${wizard.name} telah dihapus dari daftar favorit Hogwarts.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.grey.shade800,
         colorText: Colors.white,
@@ -71,14 +73,14 @@ class FavoriteController extends GetxController {
         duration: const Duration(seconds: 2),
       );
     } else {
-      _favorites.add(character);
+      _favorites.add(wizard);
       _saveFavorites();
-      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika item berhasil ditambahkan ke favorit.
+      // TERUBAH: Notifikasi SnackBar saat karakter ditambahkan ke favorit bertema ungu magis
       Get.snackbar(
         'Ditambahkan ke Favorit',
-        '${character.name} berhasil ditambahkan ke daftar favorit!',
+        '${wizard.name} berhasil ditambahkan ke daftar penyihir favorit!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.indigo,
+        backgroundColor: Colors.deepPurple,
         colorText: Colors.white,
         icon: const Icon(Icons.favorite, color: Colors.white),
         margin: const EdgeInsets.all(16),
@@ -88,12 +90,13 @@ class FavoriteController extends GetxController {
     }
   }
 
-  void removeFavorite(CharacterModel character) {
-    _favorites.removeWhere((item) => item.id == character.id);
+  // TERUBAH: Mengubah parameter method removeFavorite menjadi WizardModel wizard
+  void removeFavorite(WizardModel wizard) {
+    _favorites.removeWhere((item) => item.id == wizard.id);
     _saveFavorites();
     Get.snackbar(
-      'Item Dihapus',
-      '${character.name} telah dihapus dari daftar favorit.',
+      'Karakter Dihapus',
+      '${wizard.name} telah dihapus dari daftar favorit.',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red.shade700,
       colorText: Colors.white,
