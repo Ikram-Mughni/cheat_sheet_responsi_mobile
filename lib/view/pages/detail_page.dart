@@ -1,10 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/favorite_controller.dart';
-import '../../model/character_model.dart';
+import '../../model/meal_model.dart';
+import '../../service/api_service.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
+
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  late MealModel _meal;
+  bool _isLoadingDetail = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _meal = Get.arguments as MealModel;
+    _checkAndFetchFullDetail();
+  }
+
+  Future<void> _checkAndFetchFullDetail() async {
+    // Jika data berasal dari filter kategori (instruksi masih default), ambil detail lengkap
+    if (_meal.instructions == 'Tidak ada instruksi khusus.' || _meal.area == 'Internasional') {
+      setState(() => _isLoadingDetail = true);
+      try {
+        final fullMeal = await ApiService.fetchMealDetail(_meal.id);
+        if (fullMeal != null && mounted) {
+          setState(() {
+            _meal = fullMeal;
+          });
+        }
+      } catch (_) {}
+      if (mounted) {
+        setState(() => _isLoadingDetail = false);
+      }
+    }
+  }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
@@ -12,7 +46,7 @@ class DetailPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: Colors.indigo),
+          Icon(icon, size: 20, color: Colors.deepOrange),
           const SizedBox(width: 12),
           SizedBox(
             width: 110,
@@ -42,25 +76,21 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO (RESPONSI): Ganti casting 'as CharacterModel' sesuai dengan Model data yang dikirim via Get.arguments.
-    final CharacterModel character = Get.arguments as CharacterModel;
     final FavoriteController favController = Get.find<FavoriteController>();
 
     return Scaffold(
       appBar: AppBar(
-        // TODO (RESPONSI): Sesuaikan judul AppBar dengan nama/title objek model.
-        title: Text(character.name),
+        title: Text(_meal.name),
         actions: [
           Obx(() {
-            // TODO (RESPONSI): Sesuaikan ID unik model untuk cek status favorit.
-            final isFav = favController.isFavorite(character.id);
+            final isFav = favController.isFavorite(_meal.id);
             return IconButton(
               icon: Icon(
                 isFav ? Icons.favorite : Icons.favorite_border,
-                color: isFav ? Colors.red : Colors.white,
+                color: isFav ? Colors.redAccent : Colors.white,
               ),
               tooltip: isFav ? 'Hapus dari favorit' : 'Tambah ke favorit',
-              onPressed: () => favController.toggleFavorite(character),
+              onPressed: () => favController.toggleFavorite(_meal),
             );
           }),
         ],
@@ -69,14 +99,13 @@ class DetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar Utama (Hero Banner)
+            // Banner Foto Resep
             Container(
               width: double.infinity,
               height: 280,
               color: Colors.grey.shade100,
               child: Image.network(
-                // TODO (RESPONSI): Sesuaikan pemanggilan data gambar utama ini dengan properti model yang baru (misal: item.image / item.poster).
-                character.image,
+                _meal.thumb,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -94,31 +123,31 @@ class DetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Judul & Badge Status
+                  // Nama Resep & Badge Kategori
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        // TODO (RESPONSI): Sesuaikan pemanggilan data judul/nama utama ini dengan properti model yang baru.
                         child: Text(
-                          character.name,
+                          _meal.name,
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      // TODO (RESPONSI): Sesuaikan badge kategori/status dengan field model baru.
+                      const SizedBox(width: 8),
                       Chip(
                         label: Text(
-                          character.status,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          _meal.category,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepOrange,
+                          ),
                         ),
-                        backgroundColor: character.status.toLowerCase() == 'alive'
-                            ? Colors.green.shade100
-                            : (character.status.toLowerCase() == 'dead'
-                                ? Colors.red.shade100
-                                : Colors.grey.shade200),
+                        backgroundColor: Colors.deepOrange.shade50,
+                        side: BorderSide(color: Colors.deepOrange.shade200),
                       ),
                     ],
                   ),
@@ -132,21 +161,60 @@ class DetailPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // TODO (RESPONSI): Ganti teks judul section kartu info ini sesuai tema aplikasi.
                           const Text(
-                            'Informasi Lengkap',
+                            'Informasi Resep',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.indigo,
+                              color: Colors.deepOrange,
                             ),
                           ),
                           const Divider(height: 24),
-                          // TODO (RESPONSI): Sesuaikan baris-baris informasi detail ini dengan atribut model baru.
-                          _buildDetailRow(Icons.category_outlined, 'Spesies', character.species),
-                          _buildDetailRow(Icons.person_outline, 'Gender', character.gender),
-                          _buildDetailRow(Icons.public_outlined, 'Asal (Origin)', character.origin),
-                          _buildDetailRow(Icons.location_on_outlined, 'Lokasi', character.location),
+                          _buildDetailRow(Icons.restaurant_menu, 'Kategori', _meal.category),
+                          _buildDetailRow(Icons.public, 'Asal Masakan', _meal.area),
+                          _buildDetailRow(Icons.tag, 'ID Resep', _meal.id),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Card Instruksi Memasak
+                  Card(
+                    elevation: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Instruksi Memasak',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepOrange,
+                                ),
+                              ),
+                              if (_isLoadingDetail)
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                            ],
+                          ),
+                          const Divider(height: 24),
+                          Text(
+                            _meal.instructions,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              height: 1.6,
+                              color: Colors.black87,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -159,13 +227,12 @@ class DetailPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: Obx(() {
-        final isFav = favController.isFavorite(character.id);
+        final isFav = favController.isFavorite(_meal.id);
         return FloatingActionButton.extended(
-          onPressed: () => favController.toggleFavorite(character),
+          onPressed: () => favController.toggleFavorite(_meal),
           icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-          // TODO (RESPONSI): Ganti label teks tombol aksi favorit jika diperlukan.
-          label: Text(isFav ? 'Hapus Favorit' : 'Tambah Favorit'),
-          backgroundColor: isFav ? Colors.red : Colors.indigo,
+          label: Text(isFav ? 'Hapus Favorit' : 'Simpan Resep'),
+          backgroundColor: isFav ? Colors.red.shade600 : Colors.deepOrange,
           foregroundColor: Colors.white,
         );
       }),

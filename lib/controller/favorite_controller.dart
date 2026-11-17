@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/character_model.dart';
+import '../model/meal_model.dart';
 
 class FavoriteController extends GetxController {
-  // TODO (RESPONSI): Ganti nama variabel list dan tipe Model ini sesuai tema (misal: RxList<MovieModel> _favorites = <MovieModel>[].obs;).
-  final RxList<CharacterModel> _favorites = <CharacterModel>[].obs;
-  List<CharacterModel> get favorites => _favorites;
+  // TODO (RESPONSI): Ganti nama variabel list dan tipe Model ini sesuai tema
+  final RxList<MealModel> _favorites = <MealModel>[].obs;
+  List<MealModel> get favorites => _favorites;
 
   @override
   void onInit() {
@@ -19,8 +19,8 @@ class FavoriteController extends GetxController {
   Future<String> _getFavKey() async {
     final prefs = await SharedPreferences.getInstance();
     final String currentUser = prefs.getString('currentUser') ?? 'guest';
-    // TODO (RESPONSI): Sesuaikan prefix nama key SharedPreferences favorit jika diperlukan.
-    return 'app_favorites_$currentUser';
+    // TODO (RESPONSI): Sesuaikan prefix nama key SharedPreferences favorit jika diperlukan
+    return 'culinary_favorites_$currentUser';
   }
 
   // Load data favorit dari Local Storage (SharedPreferences)
@@ -33,8 +33,7 @@ class FavoriteController extends GetxController {
     if (rawData != null && rawData.isNotEmpty) {
       try {
         final List<dynamic> decoded = jsonDecode(rawData);
-        // TODO (RESPONSI): Pastikan fromJson pada model digunakan untuk deserialize data lokal.
-        _favorites.assignAll(decoded.map((item) => CharacterModel.fromJson(item)).toList());
+        _favorites.assignAll(decoded.map((item) => MealModel.fromJson(item)).toList());
       } catch (e) {
         _favorites.clear();
       }
@@ -45,23 +44,21 @@ class FavoriteController extends GetxController {
   Future<void> _saveFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getFavKey();
-    // TODO (RESPONSI): Pastikan toJson() tersedia pada model untuk serialisasi JSON.
     final String encoded = jsonEncode(_favorites.map((e) => e.toJson()).toList());
     await prefs.setString(key, encoded);
   }
 
-  bool isFavorite(int id) {
-    return _favorites.any((character) => character.id == id);
+  bool isFavorite(String id) {
+    return _favorites.any((meal) => meal.id == id);
   }
 
-  void toggleFavorite(CharacterModel character) {
-    if (isFavorite(character.id)) {
-      _favorites.removeWhere((item) => item.id == character.id);
+  void toggleFavorite(MealModel meal) {
+    if (isFavorite(meal.id)) {
+      _favorites.removeWhere((item) => item.id == meal.id);
       _saveFavorites();
-      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika diperlukan.
       Get.snackbar(
         'Dihapus dari Favorit',
-        '${character.name} telah dihapus dari daftar favorit.',
+        '${meal.name} telah dihapus dari daftar resep favorit.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.grey.shade800,
         colorText: Colors.white,
@@ -71,14 +68,13 @@ class FavoriteController extends GetxController {
         duration: const Duration(seconds: 2),
       );
     } else {
-      _favorites.add(character);
+      _favorites.add(meal);
       _saveFavorites();
-      // TODO (RESPONSI): Sesuaikan teks notifikasi SnackBar jika item berhasil ditambahkan ke favorit.
       Get.snackbar(
         'Ditambahkan ke Favorit',
-        '${character.name} berhasil ditambahkan ke daftar favorit!',
+        '${meal.name} berhasil disimpan ke daftar resep favorit!',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.indigo,
+        backgroundColor: Colors.deepOrange,
         colorText: Colors.white,
         icon: const Icon(Icons.favorite, color: Colors.white),
         margin: const EdgeInsets.all(16),
@@ -88,12 +84,12 @@ class FavoriteController extends GetxController {
     }
   }
 
-  void removeFavorite(CharacterModel character) {
-    _favorites.removeWhere((item) => item.id == character.id);
+  void removeFavorite(MealModel meal) {
+    _favorites.removeWhere((item) => item.id == meal.id);
     _saveFavorites();
     Get.snackbar(
-      'Item Dihapus',
-      '${character.name} telah dihapus dari daftar favorit.',
+      'Resep Dihapus',
+      '${meal.name} telah dihapus dari daftar favorit.',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red.shade700,
       colorText: Colors.white,

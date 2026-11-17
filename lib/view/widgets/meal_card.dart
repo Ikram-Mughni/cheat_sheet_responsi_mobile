@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/favorite_controller.dart';
-import '../../model/character_model.dart';
+import '../../model/meal_model.dart';
 
-class CharacterCard extends StatelessWidget {
-  // TODO (RESPONSI): Ganti tipe Model 'CharacterModel' dengan Model baru (misal: MovieModel movie).
-  final CharacterModel character;
+class MealCard extends StatelessWidget {
+  final MealModel meal;
   final VoidCallback onTap;
 
-  const CharacterCard({
+  const MealCard({
     super.key,
-    required this.character,
+    required this.meal,
     required this.onTap,
   });
 
@@ -27,20 +26,19 @@ class CharacterCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Gambar Thumbnail Item
+              // Gambar Thumbnail Resep
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
-                  // TODO (RESPONSI): Sesuaikan pemanggilan data gambar ini dengan properti model baru (misal: item.poster / item.image).
-                  character.image,
-                  width: 70,
-                  height: 70,
+                  meal.thumb,
+                  width: 75,
+                  height: 75,
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      width: 70,
-                      height: 70,
+                      width: 75,
+                      height: 75,
                       color: Colors.grey.shade100,
                       child: const Center(
                         child: SizedBox(
@@ -52,23 +50,22 @@ class CharacterCard extends StatelessWidget {
                     );
                   },
                   errorBuilder: (context, error, stackTrace) => Container(
-                    width: 70,
-                    height: 70,
+                    width: 75,
+                    height: 75,
                     color: Colors.grey.shade200,
-                    child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                    child: const Icon(Icons.restaurant, color: Colors.grey),
                   ),
                 ),
               ),
               const SizedBox(width: 14),
 
-              // Informasi Item
+              // Informasi Resep
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TODO (RESPONSI): Sesuaikan pemanggilan data judul/nama utama ini dengan atribut model baru (misal: item.name / item.title).
                     Text(
-                      character.name,
+                      meal.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -77,25 +74,24 @@ class CharacterCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // TODO (RESPONSI): Sesuaikan pemanggilan data sub-informasi ini dengan atribut model baru (misal: item.category / item.year).
                     Text(
-                      '${character.status} • ${character.species}',
+                      meal.category,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.deepOrange.shade700,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // TODO (RESPONSI): Sesuaikan atau ganti baris info ketiga ini (misal: rating, harga, atau lokasi).
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                        Icon(Icons.public, size: 14, color: Colors.grey.shade600),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            character.location,
+                            meal.area,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -112,15 +108,14 @@ class CharacterCard extends StatelessWidget {
 
               // Tombol Favorit Reaktif
               Obx(() {
-                // TODO (RESPONSI): Sesuaikan ID unik objek model (misal: character.id / movie.id).
-                final isFav = favController.isFavorite(character.id);
+                final isFav = favController.isFavorite(meal.id);
                 return IconButton(
                   icon: Icon(
                     isFav ? Icons.favorite : Icons.favorite_border,
-                    color: isFav ? Colors.red : Colors.grey,
+                    color: isFav ? Colors.deepOrange : Colors.grey,
                   ),
                   tooltip: isFav ? 'Hapus dari favorit' : 'Tambah favorit',
-                  onPressed: () => favController.toggleFavorite(character),
+                  onPressed: () => favController.toggleFavorite(meal),
                 );
               }),
             ],

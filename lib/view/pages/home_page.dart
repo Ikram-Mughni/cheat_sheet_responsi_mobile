@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/character_controller.dart';
+import '../../controller/meal_controller.dart';
 import '../../routes/app_routes.dart';
-import '../widgets/character_card.dart';
+import '../widgets/meal_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
-  final CharacterController _charController = Get.find<CharacterController>();
+  final MealController _mealController = Get.find<MealController>();
 
   @override
   void dispose() {
@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO (RESPONSI): Ganti opsi statusList ini dengan kategori/filter dari API soal responsi (misal: ['All', 'Action', 'Comedy']).
-    final statusList = ['All', 'Alive', 'Dead', 'Unknown'];
+    // TODO (RESPONSI): Ganti opsi categoryList ini sesuai kategori API
+    final categoryList = ['All', 'Seafood', 'Chicken', 'Beef', 'Dessert', 'Vegetarian'];
 
     return Column(
       children: [
@@ -38,15 +38,14 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    // TODO (RESPONSI): Ganti hint search sesuai tema (misal: 'Cari nama produk...', 'Cari judul film...').
-                    hintText: 'Cari data...',
+                    hintText: 'Cari resep makanan...',
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear, size: 20),
                             onPressed: () {
                               _searchController.clear();
-                              _charController.setSearchQuery('');
+                              _mealController.setSearchQuery('');
                               setState(() {});
                             },
                           )
@@ -56,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                   onChanged: (val) {
                     setState(() {});
                   },
-                  onSubmitted: (value) => _charController.setSearchQuery(value),
+                  onSubmitted: (value) => _mealController.setSearchQuery(value),
                 ),
               ),
               const SizedBox(width: 8),
@@ -69,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: () {
                   FocusScope.of(context).unfocus();
-                  _charController.setSearchQuery(_searchController.text);
+                  _mealController.setSearchQuery(_searchController.text);
                 },
                 child: const Text('Cari'),
               ),
@@ -77,28 +76,45 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Filter Chips Area
+        // Filter Chips Area + Sort Button
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           color: Colors.white,
-          child: Obx(
-            () => SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: statusList.map((status) {
-                  final isSelected = _charController.selectedStatus == status;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(status),
-                      selected: isSelected,
-                      onSelected: (_) => _charController.setStatusFilter(status),
+          child: Row(
+            children: [
+              Expanded(
+                child: Obx(
+                  () => SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categoryList.map((category) {
+                        final isSelected = _mealController.selectedCategory == category;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            label: Text(category),
+                            selected: isSelected,
+                            selectedColor: Colors.deepOrange.shade100,
+                            checkmarkColor: Colors.deepOrange,
+                            onSelected: (_) => _mealController.setCategoryFilter(category),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
               ),
-            ),
+              // Tombol Sort A-Z (Bonus 2)
+              Obx(() => IconButton(
+                    icon: Icon(
+                      _mealController.isAscending ? Icons.sort_by_alpha : Icons.sort,
+                      color: _mealController.isAscending ? Colors.deepOrange : Colors.grey.shade700,
+                    ),
+                    tooltip: _mealController.isAscending ? 'Urutan Default' : 'Urutkan A-Z',
+                    onPressed: () => _mealController.toggleSort(),
+                  )),
+            ],
           ),
         ),
         const Divider(height: 1, thickness: 1),
@@ -106,11 +122,11 @@ class _HomePageState extends State<HomePage> {
         // List Area
         Expanded(
           child: Obx(() {
-            if (_charController.isLoading) {
+            if (_mealController.isLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (_charController.errorMessage.isNotEmpty) {
+            if (_mealController.errorMessage.isNotEmpty) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -119,14 +135,13 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       const Icon(Icons.error_outline, size: 48, color: Colors.red),
                       const SizedBox(height: 12),
-                      // TODO (RESPONSI): Ganti teks judul pesan error jika diperlukan.
                       const Text(
-                        'Gagal memuat data',
+                        'Gagal memuat resep masakan',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        _charController.errorMessage,
+                        _mealController.errorMessage,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
@@ -134,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                       ElevatedButton.icon(
                         icon: const Icon(Icons.refresh, size: 18),
                         label: const Text('Coba Lagi'),
-                        onPressed: () => _charController.fetchCharacters(),
+                        onPressed: () => _mealController.fetchMeals(),
                       ),
                     ],
                   ),
@@ -142,21 +157,20 @@ class _HomePageState extends State<HomePage> {
               );
             }
 
-            if (_charController.characters.isEmpty) {
+            if (_mealController.meals.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.search_off, size: 54, color: Colors.grey.shade400),
                     const SizedBox(height: 12),
-                    // TODO (RESPONSI): Ganti teks saat data tidak ditemukan / kosong.
                     const Text(
-                      'Data tidak ditemukan',
+                      'Resep tidak ditemukan',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Silakan coba gunakan kata kunci pencarian atau filter lain.',
+                      'Silakan coba kata kunci atau kategori masakan yang berbeda.',
                       style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                     ),
                   ],
@@ -165,17 +179,16 @@ class _HomePageState extends State<HomePage> {
             }
 
             return RefreshIndicator(
-              onRefresh: () async => await _charController.fetchCharacters(),
+              onRefresh: () async => await _mealController.fetchMeals(),
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _charController.characters.length,
+                itemCount: _mealController.meals.length,
                 itemBuilder: (context, index) {
-                  final character = _charController.characters[index];
-                  // TODO (RESPONSI): Sesuaikan argumen data yang dikirimkan ke detail_page saat item ditekan.
-                  return CharacterCard(
-                    character: character,
+                  final meal = _mealController.meals[index];
+                  return MealCard(
+                    meal: meal,
                     onTap: () {
-                      Get.toNamed(AppRoutes.detail, arguments: character);
+                      Get.toNamed(AppRoutes.detail, arguments: meal);
                     },
                   );
                 },

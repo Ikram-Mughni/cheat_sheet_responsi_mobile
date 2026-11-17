@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import '../controller/auth_controller.dart';
-import '../controller/character_controller.dart';
-import '../controller/episode_controller.dart';
+import '../controller/category_controller.dart';
 import '../controller/favorite_controller.dart';
+import '../controller/meal_controller.dart';
 import '../controller/root_controller.dart';
 import '../view/pages/detail_page.dart';
 import '../view/pages/login_page.dart';
@@ -22,15 +22,13 @@ class RootBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<AuthController>(() => AuthController());
     Get.lazyPut<RootController>(() => RootController());
-    // TODO (RESPONSI): Daftarkan Controller baru di sini jika membuat Controller baru untuk tema API yang berbeda.
-    Get.lazyPut<CharacterController>(() => CharacterController());
+    Get.lazyPut<MealController>(() => MealController());
     Get.lazyPut<FavoriteController>(() => FavoriteController());
-    Get.lazyPut<EpisodeController>(() => EpisodeController());
+    Get.lazyPut<CategoryController>(() => CategoryController());
   }
 }
 
 class AppPages {
-  // TODO (RESPONSI): Daftarkan halaman dan binding baru di sini jika menambahkan route baru di aplikasi.
   static final routes = [
     GetPage(
       name: AppRoutes.login,

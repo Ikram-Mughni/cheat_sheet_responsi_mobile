@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/auth_controller.dart';
+import '../../controller/meal_controller.dart';
 import '../../controller/root_controller.dart';
-import 'episode_page.dart';
+import 'category_page.dart';
 import 'favorite_page.dart';
 import 'home_page.dart';
 
@@ -14,11 +15,10 @@ class RootPage extends StatelessWidget {
     final RootController rootController = Get.find<RootController>();
     final AuthController authController = Get.find<AuthController>();
 
-    // TODO (RESPONSI): Sesuaikan daftar halaman yang dikelola oleh IndexedStack / BottomNavigationBar.
     final List<Widget> pages = const [
       HomePage(),
       FavoritePage(),
-      EpisodePage(),
+      CategoryPage(),
     ];
 
     return Scaffold(
@@ -31,16 +31,15 @@ class RootPage extends StatelessWidget {
               Text(
                 authController.username.isNotEmpty
                     ? 'Halo, ${authController.username}!'
-                    : 'Halo, Pengguna!',
+                    : 'Halo, Pecinta Kuliner!',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Colors.white,
                 ),
               ),
-              // TODO (RESPONSI): Ganti teks sub-judul di AppBar ini sesuai tema soal responsi.
               const Text(
-                'Katalog Data & Informasi',
+                'Katalog Resep & Kuliner Dunia',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.white70,
@@ -50,17 +49,32 @@ class RootPage extends StatelessWidget {
           ),
         ),
         actions: [
+          // Bonus 2: Tombol Sort A-Z di AppBar saat berada di tab Resep
+          Obx(() {
+            if (rootController.currentIndex == 0) {
+              final mealController = Get.find<MealController>();
+              return Obx(() => IconButton(
+                    icon: Icon(
+                      mealController.isAscending ? Icons.sort_by_alpha : Icons.sort,
+                      color: mealController.isAscending ? Colors.amberAccent : Colors.white,
+                    ),
+                    tooltip: mealController.isAscending ? 'Kembalikan Urutan' : 'Urutkan A-Z',
+                    onPressed: () => mealController.toggleSort(),
+                  ));
+            }
+            return const SizedBox.shrink();
+          }),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
             onPressed: () {
               Get.defaultDialog(
                 title: 'Konfirmasi Keluar',
-                middleText: 'Apakah Anda yakin ingin keluar?',
+                middleText: 'Apakah Anda yakin ingin keluar dari akun?',
                 textConfirm: 'Ya, Keluar',
                 textCancel: 'Batal',
                 confirmTextColor: Colors.white,
-                buttonColor: Colors.red,
+                buttonColor: Colors.deepOrange,
                 onConfirm: () {
                   Get.back();
                   authController.logout();
@@ -80,12 +94,11 @@ class RootPage extends StatelessWidget {
         () => BottomNavigationBar(
           currentIndex: rootController.currentIndex,
           onTap: rootController.changeIndex,
-          // TODO (RESPONSI): Sesuaikan label teks dan icon pada BottomNavigationBarItem sesuai kebutuhan soal.
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Beranda',
+              icon: Icon(Icons.restaurant_menu_outlined),
+              activeIcon: Icon(Icons.restaurant_menu),
+              label: 'Resep',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.favorite_border),
@@ -93,9 +106,9 @@ class RootPage extends StatelessWidget {
               label: 'Favorit',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.list_alt_outlined),
-              activeIcon: Icon(Icons.list_alt),
-              label: 'Episode',
+              icon: Icon(Icons.category_outlined),
+              activeIcon: Icon(Icons.category),
+              label: 'Kategori',
             ),
           ],
         ),

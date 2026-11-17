@@ -10,7 +10,6 @@ void main() async {
 
   // Inisialisasi Hive
   await Hive.initFlutter();
-  // TODO (RESPONSI): Sesuaikan nama box Hive jika di soal ditentukan nama box tertentu (atau jika mendaftarkan TypeAdapter custom).
   await Hive.openBox('usersBox');
 
   // Cek session login
@@ -28,19 +27,18 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      // TODO (RESPONSI): Ganti judul aplikasi sesuai tema soal.
-      title: 'Aplikasi Responsi',
+      // Bonus 1: Judul dan tema aplikasi disesuaikan dengan tema kuliner
+      title: 'Culinary Recipe Explorer',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        // TODO (RESPONSI): Ganti warna tema utama (seedColor) jika ingin menyesuaikan dengan tema soal (misal: Colors.blue, Colors.teal, Colors.deepPurple).
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
+          seedColor: Colors.deepOrange,
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+        scaffoldBackgroundColor: const Color(0xFFFBFBFB),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Colors.deepOrange,
           foregroundColor: Colors.white,
           elevation: 1,
           centerTitle: false,
@@ -58,14 +56,14 @@ class App extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.indigo, width: 2),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            borderSide: BorderSide(color: Colors.deepOrange, width: 2),
           ),
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
-          selectedItemColor: Colors.indigo,
+          selectedItemColor: Colors.deepOrange,
           unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed,
           elevation: 8,

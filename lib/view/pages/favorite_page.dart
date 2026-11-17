@@ -21,14 +21,13 @@ class FavoritePage extends StatelessWidget {
                 children: [
                   Icon(Icons.favorite_border, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
-                  // TODO (RESPONSI): Ganti teks judul status kosong ini sesuai tema aplikasi.
                   const Text(
-                    'Belum ada data favorit',
+                    'Belum ada resep favorit',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Item yang Anda sukai akan tersimpan pada daftar ini.',
+                    'Resep masakan yang Anda sukai akan tersimpan pada daftar ini.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
@@ -42,11 +41,10 @@ class FavoritePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: favController.favorites.length,
           itemBuilder: (context, index) {
-            final character = favController.favorites[index];
+            final meal = favController.favorites[index];
 
             return Dismissible(
-              // TODO (RESPONSI): Sesuaikan ID unik model (misal: item.id / item.idMeal).
-              key: Key('fav_${character.id}'),
+              key: Key('fav_${meal.id}'),
               direction: DismissDirection.endToStart,
               background: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -69,7 +67,7 @@ class FavoritePage extends StatelessWidget {
                 ),
               ),
               onDismissed: (_) {
-                favController.removeFavorite(character);
+                favController.removeFavorite(meal);
               },
               child: Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -78,8 +76,7 @@ class FavoritePage extends StatelessWidget {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      // TODO (RESPONSI): Sesuaikan pemanggilan data gambar thumbnail ini dengan model baru.
-                      character.image,
+                      meal.thumb,
                       width: 52,
                       height: 52,
                       fit: BoxFit.cover,
@@ -87,21 +84,18 @@ class FavoritePage extends StatelessWidget {
                         width: 52,
                         height: 52,
                         color: Colors.grey.shade200,
-                        child: const Icon(Icons.person, color: Colors.grey),
+                        child: const Icon(Icons.restaurant, color: Colors.grey),
                       ),
                     ),
                   ),
-                  // TODO (RESPONSI): Sesuaikan nama/judul objek model favorit.
                   title: Text(
-                    character.name,
+                    meal.name,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // TODO (RESPONSI): Sesuaikan sub-informasi objek model favorit.
-                  subtitle: Text('${character.status} • ${character.species}'),
+                  subtitle: Text('${meal.category} • ${meal.area}'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                   onTap: () {
-                    // TODO (RESPONSI): Sesuaikan data arguments yang dikirim ke halaman detail.
-                    Get.toNamed(AppRoutes.detail, arguments: character);
+                    Get.toNamed(AppRoutes.detail, arguments: meal);
                   },
                 ),
               ),
